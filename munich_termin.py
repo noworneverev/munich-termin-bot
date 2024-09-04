@@ -209,8 +209,8 @@ def munich_notfall_termin():
         if times:
             has_appointments = True
             message.append(f"Date: {date}")
-            for time in times:
-                message.append(f" - {time}")
+            time_slots = ", ".join(times)
+            message.append(f" - {time_slots}")
 
     message_str = "\n".join(message)
     if has_appointments:

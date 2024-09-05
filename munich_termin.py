@@ -187,17 +187,26 @@ def notify_munich_an_termin(bot: telegram.Bot):
 
 # notify_munich_an_termin()
 
-def munich_notfall_termin():
+def munich_notfall_termin(case_type):
     url = "https://terminvereinbarung.muenchen.de/abh/termin/"
     session = requests.Session()
 
     token = get_token(session, url)
 
+    case_type_mapping = {
+        'UA 35': 'CASETYPES[Notfalltermin UA 35]',
+        'UA 32': 'CASETYPES[Notfalltermin UA32]'
+    }
+
+    if case_type not in case_type_mapping:
+        raise ValueError(f"Invalid case type: {case_type}. Available case types are 'UA 35' and 'UA 32'.")
+
     payload = {
         'FRM_CASETYPES_token': token,
         'step': 'WEB_APPOINT_SEARCH_BY_CASETYPES',
-        'CASETYPES[Notfalltermin UA 35]': 1,
+        case_type_mapping[case_type]: 1,
     }
+
     response = session.post(url, payload)
     json_str = re.search(r'jsonAppoints = \'(.*?)\'', response.text).group(1)
     appointments = json.loads(json_str)['LOADBALANCER']['appoints']
@@ -214,17 +223,21 @@ def munich_notfall_termin():
 
     message_str = "\n".join(message)
     if has_appointments:
-        logging.info(f"{'Available slots for Munich Notfall Termin: ' + message_str}")                        
+        logging.info(f"Available slots for Munich Notfalltermin {case_type}: {message_str}")                        
         return True, message_str
     else:
-        logging.info(f'{"No available slots for Munich Notfall Termin."}')
-        return False, "No available slots for Munich Notfall Termin."
+        logging.info(f'No available slots for Munich Notfalltermin {case_type}.')
+        return False, f'No available slots for Munich Notfalltermin {case_type}.'
     
 
 def notify_munich_notfalltermin(bot: telegram.Bot):
-    is_available, res = munich_notfall_termin()
-    if is_available:
-        bot.send_message(chat_id=MUNICH_NOTFALL_TERMIN, text=res)
+    is_available_ua35, message_ua35 = munich_notfall_termin('UA 35')
+    is_available_ua32, message_ua32 = munich_notfall_termin('UA 32')
+
+    if is_available_ua35:
+        bot.send_message(chat_id=MUNICH_NOTFALL_TERMIN, text=message_ua35)
+    if is_available_ua32:
+        bot.send_message(chat_id=MUNICH_NOTFALL_TERMIN, text=message_ua32)
 
 
 if __name__ == '__main__':

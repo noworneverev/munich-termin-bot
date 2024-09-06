@@ -25,6 +25,7 @@ load_dotenv()
 TOKEN = os.getenv("TOKEN")
 
 MUNICH_NOTFALL_TERMIN: Final = '@munich_notfall_termin'
+MUNICH_NOTFALL_TERMIN2: Final = '@munich_notfall_termin2'
 MUNICH_RUPPERSTR_ANMELDUNG_TERMIN: Final = '@ruppertstr_anmeldung'
 MUNICH_PASING_ANMELDUNG_TERMIN: Final = '@pasing_anmeldung'
 MUNICH_LEONRODSTR_ANMELDUNG_TERMIN: Final = '@leonrodstr_anmeldung'
@@ -237,7 +238,7 @@ def notify_munich_notfalltermin(bot: telegram.Bot):
     if is_available_ua35:
         bot.send_message(chat_id=MUNICH_NOTFALL_TERMIN, text=message_ua35)
     if is_available_ua32:
-        bot.send_message(chat_id=MUNICH_NOTFALL_TERMIN, text=message_ua32)
+        bot.send_message(chat_id=MUNICH_NOTFALL_TERMIN2, text=message_ua32)
 
 
 if __name__ == '__main__':

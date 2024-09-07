@@ -32,6 +32,7 @@ MUNICH_LEONRODSTR_ANMELDUNG_TERMIN: Final = '@leonrodstr_anmeldung'
 MUNICH_FORSTENRIEDERALLEE_ANMELDUNG_TERMIN: Final = '@forstenrieder_anmeldung'
 MUNICH_RIESENFELDSTR_ANMELDUNG_TERMIN: Final = '@riesenfeldstr_anmeldung'
 MUNICH_ORLEANSSTR_ANMELDUNG_TERMIN: Final = '@orleansstr_anmeldung'
+MUNICH_VERP_CHANNEL_ID = "-1002386155451"
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logging.getLogger('WDM').setLevel(logging.ERROR)
@@ -196,7 +197,8 @@ def munich_notfall_termin(case_type):
 
     case_type_mapping = {
         'UA 35': 'CASETYPES[Notfalltermin UA 35]',
-        'UA 32': 'CASETYPES[Notfalltermin UA32]'
+        'UA 32': 'CASETYPES[Notfalltermin UA32]',
+        'Formal Obligation': 'CASETYPES[Verpflichtungserklärung (kurzfristige Aufenthalte)]'
     }
 
     if case_type not in case_type_mapping:
@@ -234,14 +236,17 @@ def munich_notfall_termin(case_type):
 def notify_munich_notfalltermin(bot: telegram.Bot):
     is_available_ua35, message_ua35 = munich_notfall_termin('UA 35')
     is_available_ua32, message_ua32 = munich_notfall_termin('UA 32')
+    is_available_formal, message_formal = munich_notfall_termin('Formal Obligation')
 
     if is_available_ua35:
         bot.send_message(chat_id=MUNICH_NOTFALL_TERMIN, text=message_ua35)
     if is_available_ua32:
         bot.send_message(chat_id=MUNICH_NOTFALL_TERMIN2, text=message_ua32)
+    if is_available_formal:
+        bot.send_message(chat_id=MUNICH_VERP_CHANNEL_ID, text=message_formal)
 
 
 if __name__ == '__main__':
-    bot = telegram.Bot(token=TOKEN)
+    bot = telegram.Bot(token=TOKEN)    
     notify_munich_notfalltermin(bot)
     notify_munich_an_termin(bot)
